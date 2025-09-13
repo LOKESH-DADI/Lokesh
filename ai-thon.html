@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adaptive Learning Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .tab-button.active {
+            background: rgba(255,255,255,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .upload-area {
+            border: 3px dashed #667eea;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            background: rgba(102, 126, 234, 0.05);
+            border-color: #764ba2;
+        }
+
+        .upload-area.dragover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: #764ba2;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e9ecef;
+        }
+
+        .assessment-container {
+            margin-top: 20px;
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 5px solid #667eea;
+        }
+
+        .question-type-selector {
+            margin-bottom: 20px;
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .metric-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.5s ease;
+        }
+
+        .recommendation-card {
+            background: linear-gradient(135deg, #f8f9fa, #ffffff);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .study-plan {
+            display: grid;
+            gap: 15px;
+        }
+
+        .study-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .study-item-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            margin-right: 15px;
+        }
+
+        .processed-content {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #28a745;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 Adaptive Learning Management System</h1>
+            <p>Your Intelligent Study Companion</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="tab-button active" onclick="switchTab('upload')">📁 Document Processing</button>
+            <button class="tab-button" onclick="switchTab('assessment')">📝 Assessment Generation</button>
+            <button class="tab-button" onclick="switchTab('analytics')">📊 Performance Analytics</button>
+            <button class="tab-button" onclick="switchTab('recommendations')">🎯 Study Recommendations</button>
+        </div>
+
+        <!-- Document Processing Tab -->
+        <div id="upload" class="tab-content active">
+            <h2>📄 Upload Educational Content</h2>
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📁</div>
+                <h3>Drop files here or click to upload</h3>
+                <p>Supports PDF, TXT, DOCX files up to 10MB</p>
+                <input type="file" id="fileInput" class="file-input" accept=".pdf,.txt,.docx" multiple onchange="handleFileUpload(event)">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="processDocuments()">🔄 Process Documents</button>
+                <button class="btn btn-secondary" onclick="clearDocuments()">🗑️ Clear All</button>
+            </div>
+            <div id="uploadedFiles"></div>
+            <div id="processedContent" style="display: none;"></div>
+        </div>
+
+        <!-- Assessment Generation Tab -->
+        <div id="assessment" class="tab-content">
+            <h2>📝 Generate Assessments</h2>
+            <div class="question-type-selector">
+                <label>Question Type:</label>
+                <select id="questionType" onchange="updateQuestionForm()">
+                    <option value="multiple-choice">Multiple Choice</option>
+                    <option value="true-false">True/False</option>
+                    <option value="short-answer">Short Answer</option>
+                    <option value="essay">Essay</option>
+                </select>
+            </div>
+            
+            <div class="assessment-container">
+                <div id="questionForm">
+                    <input type="text" id="questionText" placeholder="Enter your question here...">
+                    <div id="optionsContainer"></div>
+                    <input type="text" id="correctAnswer" placeholder="Correct answer">
+                    <textarea id="explanation" placeholder="Explanation (optional)" rows="3"></textarea>
+                </div>
+                <button class="btn btn-primary" onclick="addQuestion()">➕ Add Question</button>
+                <button class="btn btn-primary" onclick="generateAutoAssessment()">🤖 Auto-Generate from Content</button>
+            </div>
+            
+            <div id="assessmentPreview"></div>
+            <button class="btn btn-primary" onclick="startAssessment()" style="display: none;" id="startBtn">🚀 Start Assessment</button>
+        </div>
+
+        <!-- Performance Analytics Tab -->
+        <div id="analytics" class="tab-content">
+            <h2>📊 Performance Dashboard</h2>
+            <div class="dashboard-grid">
+                <div class="metric-card">
+                    <div class="metric-value" id="completionRate">85%</div>
+                    <div>Completion Rate</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="averageScore">78</div>
+                    <div>Average Score</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value" id="studyTime">24h</div>
+                    <div>Total Study Time</div>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3>📈 Progress Over Time</h3>
+                <canvas id="progressChart" width="400" height="200"></canvas>
+            </div>
+            
+            <div class="chart-container">
+                <h3>🎯 Subject Performance</h3>
+                <div id="subjectProgress">
+                    <div>Mathematics <div class="progress-bar"><div class="progress-fill" style="width: 85%"></div></div> 85%</div>
+                    <div>Science <div class="progress-bar"><div class="progress-fill" style="width: 72%"></div></div> 72%</div>
+                    <div>History <div class="progress-bar"><div class="progress-fill" style="width: 91%"></div></div> 91%</div>
+                    <div>Literature <div class="progress-bar"><div class="progress-fill" style="width: 68%"></div></div> 68%</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Study Recommendations Tab -->
+        <div id="recommendations" class="tab-content">
+            <h2>🎯 Personalized Study Recommendations</h2>
+            
+            <div class="recommendation-card">
+                <h3>🔥 Priority Areas</h3>
+                <p>Based on your recent performance, focus on these topics:</p>
+                <ul>
+                    <li><strong>Algebra:</strong> Practice solving quadratic equations</li>
+                    <li><strong>Chemistry:</strong> Review molecular bonding concepts</li>
+                    <li><strong>History:</strong> Study World War II timeline</li>
+                </ul>
+            </div>
+            
+            <div class="recommendation-card">
+                <h3>📚 Today's Study Plan</h3>
+                <div class="study-plan">
+                    <div class="study-item">
+                        <div class="study-item-icon">📖</div>
+                        <div>
+                            <strong>9:00 AM - 10:00 AM</strong><br>
+                            Review Chapter 5: Quadratic Functions
+                        </div>
+                    </div>
+                    <div class="study-item">
+                        <div class="study-item-icon">🔬</div>
+                        <div>
+                            <strong>10:30 AM - 11:30 AM</strong><br>
+                            Practice Chemistry Lab Calculations
+                        </div>
+                    </div>
+                    <div class="study-item">
+                        <div class="study-item-icon">✍️</div>
+                        <div>
+                            <strong>2:00 PM - 3:00 PM</strong><br>
+                            Take Practice Quiz: History Timeline
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recommendation-card">
+                <h3>💡 Study Tips</h3>
+                <ul>
+                    <li>🕐 Your optimal study time appears to be 10:00 AM - 12:00 PM</li>
+                    <li>📱 Consider using spaced repetition for vocabulary</li>
+                    <li>🎵 Background instrumental music improves your focus by 15%</li>
+                    <li>☕ Take a 10-minute break every 45 minutes for better retention</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        let uploadedFiles = [];
+        let assessmentQuestions = [];
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function handleFileUpload(event) {
+            const files = Array.from(event.target.files);
+            files.forEach(file => {
+                if (file.size <= 10 * 1024 * 1024) { // 10MB limit
+                    uploadedFiles.push(file);
+                    displayUploadedFile(file);
+                } else {
+                    showNotification('File too large. Maximum size is 10MB.', 'error');
+                }
+            });
+        }
+
+        function displayUploadedFile(file) {
+            const container = document.getElementById('uploadedFiles');
+            const fileDiv = document.createElement('div');
+            fileDiv.className = 'uploaded-file fade-in';
+            fileDiv.innerHTML = `
+                <div style="display: flex; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 10px; margin-top: 10px;">
+                    <span style="margin-right: 15px;">📄</span>
+                    <div style="flex: 1;">
+                        <strong>${file.name}</strong><br>
+                        <small>${(file.size / 1024 / 1024).toFixed(2)} MB</small>
+                    </div>
+                    <button class="btn btn-secondary" onclick="removeFile('${file.name}')">Remove</button>
+                </div>
+            `;
+            container.appendChild(fileDiv);
+        }
+
+        function removeFile(fileName) {
+            uploadedFiles = uploadedFiles.filter(file => file.name !== fileName);
+            document.getElementById('uploadedFiles').innerHTML = '';
+            uploadedFiles.forEach(file => displayUploadedFile(file));
+        }
+
+        function clearDocuments() {
+            uploadedFiles = [];
+            document.getElementById('uploadedFiles').innerHTML = '';
+            document.getElementById('processedContent').style.display = 'none';
+            showNotification('All documents cleared!');
+        }
+
+        function processDocuments() {
+            if (uploadedFiles.length === 0) {
+                showNotification('Please upload files first!', 'error');
+                return;
+            }
+
+            // Simulate processing
+            showNotification('Processing documents...');
+            setTimeout(() => {
+                const processedDiv = document.getElementById('processedContent');
+                processedDiv.style.display = 'block';
+                processedDiv.innerHTML = `
+                    <div class="processed-content fade-in">
+                        <h3>✅ Processing Complete!</h3>
+                        <p><strong>Files Processed:</strong> ${uploadedFiles.length}</p>
+                        <p><strong>Total Pages:</strong> ${Math.floor(Math.random() * 100) + 50}</p>
+                        <p><strong>Key Topics Identified:</strong></p>
+                        <ul>
+                            <li>Mathematical Functions and Equations</li>
+                            <li>Chemical Bonding and Reactions</li>
+                            <li>Historical Timeline Analysis</li>
+                            <li>Literary Theme Development</li>
+                        </ul>
+                        <p><strong>Difficulty Level:</strong> Intermediate</p>
+                        <button class="btn btn-primary" onclick="generateAutoAssessment()">📝 Generate Assessment</button>
+                    </div>
+                `;
+                showNotification('Documents processed successfully!');
+            }, 2000);
+        }
+
+        function updateQuestionForm() {
+            const type = document.getElementById('questionType').value;
+            const optionsContainer = document.getElementById('optionsContainer');
+            
+            optionsContainer.innerHTML = '';
+            
+            if (type === 'multiple-choice') {
+                for (let i = 1; i <= 4; i++) {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.placeholder = `Option ${i}`;
+                    input.id = `option${i}`;
+                    optionsContainer.appendChild(input);
+                }
+            } else if (type === 'true-false') {
+                optionsContainer.innerHTML = `
+                    <div style="display: flex; gap: 10px;">
+                        <label><input type="radio" name="tfAnswer" value="true"> True</label>
+                        <label><input type="radio" name="tfAnswer" value="false"> False</label>
+                    </div>
+                `;
+            }
+        }
+
+        function addQuestion() {
+            const questionText = document.getElementById('questionText').value;
+            const questionType = document.getElementById('questionType').value;
+            
+            if (!questionText.trim()) {
+                showNotification('Please enter a question!', 'error');
+                return;
+            }
+
+            let question = {
+                id: Date.now(),
+                type: questionType,
+                text: questionText,
+                explanation: document.getElementById('explanation').value
+            };
+
+            if (questionType === 'multiple-choice') {
+                question.options = [
+                    document.getElementById('option1').value,
+                    document.getElementById('option2').value,
+                    document.getElementById('option3').value,
+                    document.getElementById('option4').value
+                ];
+                question.correct = document.getElementById('correctAnswer').value;
+            } else if (questionType === 'true-false') {
+                const selected = document.querySelector('input[name="tfAnswer"]:checked');
+                question.correct = selected ? selected.value : '';
+            } else {
+                question.correct = document.getElementById('correctAnswer').value;
+            }
+
+            assessmentQuestions.push(question);
+            displayAssessmentPreview();
+            clearQuestionForm();
+            showNotification('Question added successfully!');
+        }
+
+        function clearQuestionForm() {
+            document.getElementById('questionText').value = '';
+            document.getElementById('correctAnswer').value = '';
+            document.getElementById('explanation').value = '';
+            document.getElementById('optionsContainer').innerHTML = '';
+            updateQuestionForm();
+        }
+
+        function displayAssessmentPreview() {
+            const preview = document.getElementById('assessmentPreview');
+            if (assessmentQuestions.length === 0) {
+                preview.innerHTML = '';
+                document.getElementById('startBtn').style.display = 'none';
+                return;
+            }
+
+            preview.innerHTML = `
+                <h3>📋 Assessment Preview (${assessmentQuestions.length} questions)</h3>
+                <div style="max-height: 300px; overflow-y: auto;">
+                    ${assessmentQuestions.map((q, index) => `
+                        <div class="question-card">
+                            <strong>Q${index + 1}: ${q.text}</strong>
+                            <p><em>Type: ${q.type}</em></p>
+                            ${q.options ? `<ul>${q.options.map(opt => `<li>${opt}</li>`).join('')}</ul>` : ''}
+                            <button class="btn btn-secondary" onclick="removeQuestion(${q.id})">Remove</button>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+            document.getElementById('startBtn').style.display = 'block';
+        }
+
+        function removeQuestion(id) {
+            assessmentQuestions = assessmentQuestions.filter(q => q.id !== id);
+            displayAssessmentPreview();
+        }
+
+        function generateAutoAssessment() {
+            // Simulate auto-generation based on processed content
+            if (uploadedFiles.length === 0) {
+                showNotification('Please process documents first!', 'error');
+                return;
+            }
+
+            showNotification('Generating assessment from your content...');
+            
+            setTimeout(() => {
+                const autoQuestions = [
+                    {
+                        id: Date.now() + 1,
+                        type: 'multiple-choice',
+                        text: 'What is the standard form of a quadratic equation?',
+                        options: ['ax + b = 0', 'ax² + bx + c = 0', 'ax³ + bx² + cx + d = 0', 'ax + by = c'],
+                        correct: 'ax² + bx + c = 0',
+                        explanation: 'The standard form includes the squared term as the highest degree.'
+                    },
+                    {
+                        id: Date.now() + 2,
+                        type: 'true-false',
+                        text: 'Covalent bonds involve the sharing of electrons between atoms.',
+                        correct: 'true',
+                        explanation: 'Covalent bonds are formed when atoms share electrons to achieve stability.'
+                    },
+                    {
+                        id: Date.now() + 3,
+                        type: 'short-answer',
+                        text: 'Name three major causes of World War II.',
+                        correct: 'Treaty of Versailles, Economic depression, Rise of totalitarian regimes',
+                        explanation: 'Multiple factors contributed to the outbreak of WWII.'
+                    }
+                ];
+
+                assessmentQuestions = [...assessmentQuestions, ...autoQuestions];
+                displayAssessmentPreview();
+                showNotification('Auto-generated 3 questions based on your content!');
+                
+                // Switch to assessment tab
+                switchTab('assessment');
+                document.querySelector('.tab-button[onclick="switchTab(\'assessment\')"]').classList.add('active');
+            }, 1500);
+        }
+
+        function startAssessment() {
+            if (assessmentQuestions.length === 0) {
+                showNotification('No questions available!', 'error');
+                return;
+            }
+            
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = assessmentQuestions[currentQuestionIndex];
+            const preview = document.getElementById('assessmentPreview');
+            
+            let questionHTML = `
+                <div class="question-card fade-in">
+                    <h3>Question ${currentQuestionIndex + 1} of ${assessmentQuestions.length}</h3>
+                    <p><strong>${question.text}</strong></p>
+            `;
+
+            if (question.type === 'multiple-choice') {
+                questionHTML += question.options.map((option, index) => `
+                    <label style="display: block; margin: 10px 0;">
+                        <input type="radio" name="answer" value="${option}"> ${option}
+                    </label>
+                `).join('');
+            } else if (question.type === 'true-false') {
+                questionHTML += `
+                    <label><input type="radio" name="answer" value="true"> True</label>
+                    <label><input type="radio" name="answer" value="false"> False</label>
+                `;
+            } else {
+                questionHTML += `<textarea name="answer" placeholder="Enter your answer here..." rows="4"></textarea>`;
+            }
+
+            questionHTML += `
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="submitAnswer()">
+                            ${currentQuestionIndex < assessmentQuestions.length - 1 ? 'Next Question' : 'Finish Assessment'}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            preview.innerHTML = questionHTML;
+        }
+
+        function submitAnswer() {
+            const answerInput = document.querySelector('input[name="answer"]:checked') || document.querySelector('textarea[name="answer"]');
+            
+            if (!answerInput || !answerInput.value.trim()) {
+                showNotification('Please provide an answer!', 'error');
+                return;
+            }
+
+            userAnswers.push({
+                questionId: assessmentQuestions[currentQuestionIndex].id,
+                answer: answerInput.value,
+                correct: assessmentQuestions[currentQuestionIndex].correct
+            });
+
+            currentQuestionIndex++;
+            
+            if (currentQuestionIndex < assessmentQuestions.length) {
+                showQuestion();
+            } else {
+                showAssessmentResults();
+            }
+        }
+
+        function showAssessmentResults() {
+            let correctAnswers = 0;
+            userAnswers.forEach(answer => {
+                if (answer.answer === answer.correct) {
+                    correctAnswers++;
+                }
+            });
+
+            const score = Math.round((correctAnswers / assessmentQuestions.length) * 100);
+            const preview = document.getElementById('assessmentPreview');
+            
+            preview.innerHTML = `
+                <div class="question-card fade-in">
+                    <h2>🎉 Assessment Complete!</h2>
+                    <div class="metric-card" style="margin: 20px 0;">
+                        <div class="metric-value">${score}%</div>
+                        <div>Your Score</div>
+                    </div>
+                    <p><strong>Correct Answers:</strong> ${correctAnswers} out of ${assessmentQuestions.length}</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${score}%"></div>
+                    </div>
+                    <button class="btn btn-primary" onclick="viewDetailedResults()">📊 View Detailed Results</button>
+                    <button class="btn btn-secondary" onclick="retakeAssessment()">🔄 Retake Assessment</button>
+                </div>
+            `;
+            
+            // Update analytics
+            updateAnalytics(score);
+            showNotification(`Assessment completed! You scored ${score}%`);
+        }
+
+        function updateAnalytics(newScore) {
+            // Update dashboard metrics
+            const currentAvg = parseInt(document.getElementById('averageScore').textContent);
+            const newAvg = Math.round((currentAvg + newScore) / 2);
+            document.getElementById('averageScore').textContent = newAvg;
+        }
+
+        function retakeAssessment() {
+            startAssessment();
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification show ${type}`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Drag and drop functionality
+        const uploadArea = document.querySelector('.upload-area');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.add('dragover'), false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, () => uploadArea.classList.remove('dragover'), false);
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            const files = Array.from(e.dataTransfer.files);
+            files.forEach(file => {
+                if (file.size <= 10 * 1024 * 1024) {
+                    uploadedFiles
